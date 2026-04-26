@@ -16,12 +16,14 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons.VxeMouse
             Item.knockBack = 3f;
             Item.crit = 6;
 
-            Item.mana = 14;
-            Item.useAnimation = 24;
-            Item.useTime = 24;
+            // Channeled magic spell: while LMB is held, mana drains and the mouse is alive.
+            Item.mana = 4;
+            Item.useAnimation = 18;
+            Item.useTime = 18;
             Item.useStyle = ItemUseStyleID.HoldUp;
+            Item.channel = true;
+            Item.autoReuse = true;
             Item.noMelee = true;
-            Item.autoReuse = false;
 
             Item.shoot = ModContent.ProjectileType<Projectiles.VxeMouseProjectile>();
             Item.shootSpeed = 0f;
@@ -33,31 +35,23 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons.VxeMouse
             Item.UseSound = SoundID.Item43;
         }
 
-        public override bool CanUseItem(Player player)
-        {
-            // Check that the player is actually pointing at a valid spot.
-            return player.CheckMana(Item.mana, false);
-        }
-
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            // Despawn any existing mouse owned by this player so only one is active at a time.
+            // While channeling, this hook fires repeatedly. Only spawn a mouse if one isn't already in the air.
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
                 Projectile other = Main.projectile[i];
                 if (other.active && other.owner == player.whoAmI && other.type == type)
                 {
-                    other.Kill();
+                    return false;
                 }
             }
 
             Vector2 spawnPos = player.MountedCenter;
             Vector2 toMouse = Main.MouseWorld - spawnPos;
-            Vector2 startVel = toMouse.SafeNormalize(Vector2.UnitY) * 6f;
+            Vector2 startVel = toMouse.SafeNormalize(Vector2.UnitY) * 8f;
 
             Projectile.NewProjectile(source, spawnPos, startVel, type, damage, knockback, player.whoAmI);
-
-            // Subtle cast feedback
             SoundEngine.PlaySound(SoundID.Item8, spawnPos);
             return false;
         }
