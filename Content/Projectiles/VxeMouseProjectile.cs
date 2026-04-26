@@ -11,22 +11,33 @@ using Terraria.ModLoader;
 namespace LK_Ugrumiy_WP.Content.Projectiles
 {
     /// <summary>
-    /// A magical "VXE R1 SE+" gaming mouse that flies after the player's cursor with a
-    /// wobbly animation. It deals magic damage on contact, cannot pass through tiles,
-    /// and shatters if it slams into a wall or floor at high speed.
+    /// A magical "VXE R1 SE+" gaming mouse summoned by a channeled spell.
+    /// While the player holds LMB, the mouse zips after the cursor with a wobbly
+    /// animation and deals magic damage on contact. It cannot pass through tiles:
+    /// soft bumps make it bounce, but a high-speed slam (e.g. yanking the cursor
+    /// across the screen and into the floor) shatters it and consumes one VXE
+    /// from the player's inventory. Releasing LMB simply dismisses it.
     /// </summary>
     public class VxeMouseProjectile : ModProjectile
     {
-        // Hard-impact threshold (pre-collision speed in px/tick).
-        private const float BreakSpeed = 11f;
-        // Soft-impact bounce/slide damping.
+        // Movement tuning.
+        private const float SpringStrength = 0.9f;
+        private const float Damping = 0.94f;
+        private const float MaxSpeed = 28f;
+        private const float DeadZone = 4f;
+
+        // Shatter detection. Compared against the maximum of (oldVelocity at impact,
+        // recent peak speed), so that a quick yank followed by a wall slam still breaks
+        // even if the spring already started decelerating the mouse.
+        private const float BreakSpeed = 13f;
+
+        // Soft-impact bounce damping (when speed is below BreakSpeed).
         private const float BounceDamping = 0.35f;
-        // Spring/damper coefficients for cursor follow.
-        private const float SpringStrength = 0.45f;
-        private const float Damping = 0.86f;
-        private const float MaxSpeed = 16f;
-        // How close to the cursor before easing off.
-        private const float DeadZone = 6f;
+
+        // Animation / wobble timer (always advances locally, no need to sync).
+        private ref float WobbleTimer => ref Projectile.localAI[0];
+        // Decaying peak speed memory used for break detection.
+        private ref float PeakSpeed => ref Projectile.localAI[1];
 
         public override void SetStaticDefaults()
         {
@@ -50,9 +61,6 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
             Projectile.localNPCHitCooldown = 18;
         }
 
-        // Animation / wobble timer (always advances locally, no need to sync).
-        private ref float WobbleTimer => ref Projectile.localAI[0];
-
         public override void AI()
         {
             Player owner = Main.player[Projectile.owner];
@@ -62,10 +70,21 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
                 return;
             }
 
+            // Channel check: keep the mouse alive only while the player is holding LMB
+            // with this exact item equipped. Releasing LMB dismisses the mouse without
+            // consuming it.
+            int vxeItemType = ModContent.ItemType<Items.Weapons.VxeMouse.VxeMouse>();
+            bool stillChanneling = owner.channel && !owner.noItems && !owner.CCed
+                && owner.HeldItem != null && owner.HeldItem.type == vxeItemType;
+            if (!stillChanneling)
+            {
+                Dismiss();
+                return;
+            }
+
             WobbleTimer += 1f;
 
-            // Only the owning client drives motion toward the cursor; other clients
-            // interpolate via vanilla projectile sync.
+            // Owning client drives motion toward the cursor; other clients sync via netUpdate.
             if (Projectile.owner == Main.myPlayer)
             {
                 Vector2 target = Main.MouseWorld;
@@ -76,7 +95,7 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
                 {
                     Vector2 dir = toTarget / dist;
                     // Spring-style acceleration: stronger when far, eases when near.
-                    float pull = MathHelper.Clamp(dist / 60f, 0.2f, 1.5f) * SpringStrength;
+                    float pull = MathHelper.Clamp(dist / 50f, 0.3f, 2.2f) * SpringStrength;
                     Projectile.velocity += dir * pull;
                 }
 
@@ -88,11 +107,16 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
                 }
 
                 // Periodically broadcast position so other clients see it follow.
-                if (Projectile.timeLeft % 6 == 0)
+                if (Projectile.timeLeft % 4 == 0)
                 {
                     Projectile.netUpdate = true;
                 }
             }
+
+            // Track recent peak speed (decays slowly) so a fast yank stays "fragile" for
+            // a few ticks and a subsequent wall slam still registers as a hard impact.
+            float currentSpeed = Projectile.velocity.Length();
+            PeakSpeed = Math.Max(PeakSpeed * 0.92f, currentSpeed);
 
             // Visual rotation: face direction of motion plus a wobble.
             float baseRot = Projectile.velocity.X * 0.05f;
@@ -112,10 +136,24 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
             Lighting.AddLight(Projectile.Center, 0.0f, 0.45f, 0.55f);
         }
 
+        private void Dismiss()
+        {
+            // Quiet poof — no item consumption.
+            for (int i = 0; i < 8; i++)
+            {
+                Dust d = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height,
+                    DustID.RainbowMk2, 0f, 0f, 150, new Color(0, 220, 255), 0.8f);
+                d.noGravity = true;
+                d.velocity *= 0.4f;
+            }
+            SoundEngine.PlaySound(SoundID.Item78, Projectile.position);
+            Projectile.Kill();
+        }
+
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            float speed = oldVelocity.Length();
-            if (speed >= BreakSpeed)
+            float impactSpeed = Math.Max(oldVelocity.Length(), PeakSpeed);
+            if (impactSpeed >= BreakSpeed)
             {
                 Shatter();
                 return false;
@@ -166,7 +204,35 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
                 d.noGravity = false;
             }
 
+            // Consume one VXE R1 SE+ from the owning player's inventory. Only the owning
+            // client can mutate its own inventory; the projectile's death itself is
+            // synced normally.
+            if (Projectile.owner == Main.myPlayer)
+            {
+                ConsumeOneFromInventory(Main.player[Projectile.owner]);
+                CombatText.NewText(Main.player[Projectile.owner].getRect(),
+                    new Color(0, 220, 255), "VXE shattered!");
+            }
+
             Projectile.Kill();
+        }
+
+        private static void ConsumeOneFromInventory(Player player)
+        {
+            int vxeItemType = ModContent.ItemType<Items.Weapons.VxeMouse.VxeMouse>();
+            for (int i = 0; i < player.inventory.Length; i++)
+            {
+                Item slot = player.inventory[i];
+                if (slot != null && slot.type == vxeItemType && slot.stack > 0)
+                {
+                    slot.stack--;
+                    if (slot.stack <= 0)
+                    {
+                        slot.TurnToAir();
+                    }
+                    return;
+                }
+            }
         }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
