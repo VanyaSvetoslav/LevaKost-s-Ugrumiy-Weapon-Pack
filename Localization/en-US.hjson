@@ -61,6 +61,17 @@
 					'''
 			}
 
+			VxeMouse: {
+				DisplayName: VXE R1 SE+
+				Tooltip:
+					'''
+					A magical gaming mouse that flies after your cursor
+					Wobbles, bonks enemies and shatters on hard impact
+					Cannot pass through walls
+					'8000Hz of pure dopamine'
+					'''
+			}
+
 			SpookyCandy: {
 				DisplayName: Spooky Candy
 				Tooltip:
