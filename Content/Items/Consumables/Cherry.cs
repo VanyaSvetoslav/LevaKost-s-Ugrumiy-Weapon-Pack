@@ -1,4 +1,4 @@
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -29,9 +29,6 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
             Item.useTime = 15;
             Item.useAnimation = 15;
             Item.useStyle = ItemUseStyleID.EatFood;
-
-            // Лутбаг/редкость
-            Item.bait = 0;
         }
 
         public override bool CanUseItem(Player player)
@@ -53,12 +50,6 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
             }
 
             return true;
-        }
-
-        public override void AddRecipes()
-        {
-            // Вишня НЕ крафтится - только дроп с мобов
-            // Это делает её настоящим редким сокровищем
         }
     }
 }

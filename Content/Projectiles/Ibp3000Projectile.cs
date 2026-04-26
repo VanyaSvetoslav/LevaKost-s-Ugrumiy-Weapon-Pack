@@ -1,4 +1,4 @@
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
@@ -12,7 +12,7 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
             Projectile.width = 32;
             Projectile.height = 32;
             Projectile.friendly = true;
-            Projectile.DamageType = DamageClass.Throwing;
+            Projectile.DamageType = DamageClass.Ranged;
             Projectile.tileCollide = true;
             Projectile.penetrate = 1;
             Projectile.timeLeft = 600;

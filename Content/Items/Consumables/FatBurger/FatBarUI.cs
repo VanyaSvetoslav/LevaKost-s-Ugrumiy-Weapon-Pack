@@ -1,4 +1,4 @@
-using Microsoft.Xna.Framework;
+п»їusing Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -8,7 +8,7 @@ using Terraria.UI;
 namespace LK_Ugrumiy_WP.Content.Items.Consumables
 {
 	/// <summary>
-	/// UI-элемент: шкала жира, отображаемая на экране.
+	/// UI-СЌР»РµРјРµРЅС‚: С€РєР°Р»Р° Р¶РёСЂР°, РѕС‚РѕР±СЂР°Р¶Р°РµРјР°СЏ РЅР° СЌРєСЂР°РЅРµ.
 	/// </summary>
 	public class FatBarUIState : UIState
 	{
@@ -17,11 +17,11 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 			Player player = Main.LocalPlayer;
 			var fp = player.GetModPlayer<FatPlayer>();
 
-			// Не показываем, если жир = 0
+			// РќРµ РїРѕРєР°Р·С‹РІР°РµРј, РµСЃР»Рё Р¶РёСЂ = 0
 			if (fp.FatLevel <= 0f)
 				return;
 
-			// Позиция бара (справа от мини-карты)
+			// РџРѕР·РёС†РёСЏ Р±Р°СЂР° (СЃРїСЂР°РІР° РѕС‚ РјРёРЅРё-РєР°СЂС‚С‹)
 			float screenX = Main.screenWidth - 260f;
 			float screenY = 80f;
 
@@ -29,11 +29,11 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 			float barHeight = 20f;
 			float fillRatio = fp.FatLevel / FatPlayer.MaxFat;
 
-			// Фон бара (тёмный)
+			// Р¤РѕРЅ Р±Р°СЂР° (С‚С‘РјРЅС‹Р№)
 			Rectangle bgRect = new Rectangle((int)screenX, (int)screenY, (int)barWidth, (int)barHeight);
 			spriteBatch.Draw(TextureAssets.MagicPixel.Value, bgRect, Color.Black * 0.7f);
 
-			// Заполнение бара (цвет зависит от уровня)
+			// Р—Р°РїРѕР»РЅРµРЅРёРµ Р±Р°СЂР° (С†РІРµС‚ Р·Р°РІРёСЃРёС‚ РѕС‚ СѓСЂРѕРІРЅСЏ)
 			Color barColor = GetFatColor(fp.FatStage);
 			Rectangle fillRect = new Rectangle(
 				(int)screenX + 2,
@@ -43,22 +43,22 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 			);
 			spriteBatch.Draw(TextureAssets.MagicPixel.Value, fillRect, barColor);
 
-			// Рамка
+			// Р Р°РјРєР°
 			DrawBorder(spriteBatch, bgRect, Color.White * 0.5f);
 
-			// Иконка бургера слева от бара
+			// РРєРѕРЅРєР° Р±СѓСЂРіРµСЂР° СЃР»РµРІР° РѕС‚ Р±Р°СЂР°
 			string icon = GetFatIcon(fp.FatStage);
 			Vector2 iconPos = new Vector2(screenX - 25f, screenY - 2f);
 			Utils.DrawBorderString(spriteBatch, icon, iconPos, Color.White, 1f);
 
-			// Текст: "Fat: 45/100"
+			// РўРµРєСЃС‚: "Fat: 45/100"
 			string text = $"Fat: {(int)fp.FatLevel}/{(int)FatPlayer.MaxFat}";
 			Vector2 textPos = new Vector2(screenX + barWidth / 2f, screenY + barHeight + 4f);
 			Vector2 textSize = FontAssets.MouseText.Value.MeasureString(text);
 			Utils.DrawBorderString(spriteBatch, text, textPos - new Vector2(textSize.X / 2f, 0f),
 				GetFatColor(fp.FatStage), 0.8f);
 
-			// Подпись стадии
+			// РџРѕРґРїРёСЃСЊ СЃС‚Р°РґРёРё
 			string stageName = GetStageName(fp.FatStage);
 			Vector2 stagePos = new Vector2(screenX + barWidth / 2f, screenY - 18f);
 			Vector2 stageSize = FontAssets.MouseText.Value.MeasureString(stageName);
@@ -71,11 +71,11 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 		{
 			return stage switch
 			{
-				0 => new Color(150, 255, 150),   // Зелёный — нормально
-				1 => new Color(255, 255, 100),   // Жёлтый — слегка
-				2 => new Color(255, 180, 50),    // Оранжевый — полный
-				3 => new Color(255, 100, 50),    // Красно-оранжевый
-				_ => new Color(255, 50, 50),     // Красный — опасно
+				0 => new Color(150, 255, 150),   // Р—РµР»С‘РЅС‹Р№ вЂ” РЅРѕСЂРјР°Р»СЊРЅРѕ
+				1 => new Color(255, 255, 100),   // Р–С‘Р»С‚С‹Р№ вЂ” СЃР»РµРіРєР°
+				2 => new Color(255, 180, 50),    // РћСЂР°РЅР¶РµРІС‹Р№ вЂ” РїРѕР»РЅС‹Р№
+				3 => new Color(255, 100, 50),    // РљСЂР°СЃРЅРѕ-РѕСЂР°РЅР¶РµРІС‹Р№
+				_ => new Color(255, 50, 50),     // РљСЂР°СЃРЅС‹Р№ вЂ” РѕРїР°СЃРЅРѕ
 			};
 		}
 
@@ -114,7 +114,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 	}
 
 	/// <summary>
-	/// Регистрирует UI-шкалу жира в игре.
+	/// Р РµРіРёСЃС‚СЂРёСЂСѓРµС‚ UI-С€РєР°Р»Сѓ Р¶РёСЂР° РІ РёРіСЂРµ.
 	/// </summary>
 	public class FatBarUISystem : ModSystem
 	{

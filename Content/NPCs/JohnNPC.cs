@@ -1,12 +1,11 @@
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using Terraria.Utilities;
+using LK_Ugrumiy_WP.Common.Systems;
 using LK_Ugrumiy_WP.Content.Items.Accessories;
 
 namespace LK_Ugrumiy_WP.Content.NPCs
@@ -25,20 +24,9 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             "Mods.LK_Ugrumiy_WP.NPCs.JohnNPC.DisplayName",
             () => "John");
 
-        // Уникальное сообщение при смерти
-        public override LocalizedText DeathMessage => this.GetLocalization("DeathMessage");
-
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[Type] = Main.npcFrameCount[NPCID.Guide];
-
-            NPCID.Sets.ExtraFramesCount[Type] = 9;
-            NPCID.Sets.AttackFrameCount[Type] = 4;
-            NPCID.Sets.DangerDetectRange[Type] = 700;
-            NPCID.Sets.AttackType[Type] = 0;
-            NPCID.Sets.AttackTime[Type] = 90;
-            NPCID.Sets.AttackAverageChance[Type] = 30;
-            NPCID.Sets.HatOffsetY[Type] = 4;
         }
 
         public override void SetDefaults()
@@ -75,73 +63,14 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             }
         }
 
-        public override string GetChat()
-        {
-            // Проверяем, носит ли кто-то шляпу
-            for (int i = 0; i < Main.maxPlayers; i++)
-            {
-                Player player = Main.player[i];
-                if (player.active && !player.dead)
-                {
-                    var johnSystem = ModContent.GetInstance<JohnHatSystem>();
-                    if (johnSystem.playerWearingHat[i])
-                    {
-                        return Language.GetTextValue("Mods.LK_Ugrumiy_WP.Dialogue.JohnNPC.Angry");
-                    }
-                }
-            }
-
-            // Обычные диалоги
-            WeightedRandom<string> chat = new WeightedRandom<string>();
-            chat.Add(Language.GetTextValue("Mods.LK_Ugrumiy_WP.Dialogue.JohnNPC.Standard1"));
-            chat.Add(Language.GetTextValue("Mods.LK_Ugrumiy_WP.Dialogue.JohnNPC.Standard2"));
-            chat.Add(Language.GetTextValue("Mods.LK_Ugrumiy_WP.Dialogue.JohnNPC.Standard3"));
-            return chat;
-        }
-
-        public override void SetChatButtons(ref string button, ref string button2)
-        {
-            button = Language.GetTextValue("LegacyInterface.27"); // "Talk"
-        }
-
-        public override void OnChatButtonClicked(bool firstButton, ref string shop)
-        {
-            // Нет магазина
-        }
-
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            // 15% шанс выпадения шляпы (1 из 6.67 ≈ 15%)
-            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<JohnsHat>(), 1, 1, 7));
+            // ~14% шанс выпадения шляпы (1 из 7)
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<JohnsHat>(), 7));
         }
 
-        public override void TownNPCAttackStrength(ref int damage, ref float knockback)
+        public override void PostAI()
         {
-            damage = 40;
-            knockback = 4f;
-        }
-
-        public override void TownNPCAttackCooldown(ref int cooldown, ref int randExtraCooldown)
-        {
-            cooldown = 30;
-            randExtraCooldown = 30;
-        }
-
-        public override void TownNPCAttackProj(ref int projType, ref int attackDelay)
-        {
-            projType = ProjectileID.ThrowingKnife;
-            attackDelay = 1;
-        }
-
-        public override void TownNPCAttackProjSpeed(ref float multiplier, ref float gravityCorrection, ref float randomOffset)
-        {
-            multiplier = 12f;
-            randomOffset = 2f;
-        }
-
-        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
-        {
-            // Проверка: если рядом игрок в шляпе - становимся враждебным
             for (int i = 0; i < Main.maxPlayers; i++)
             {
                 Player player = Main.player[i];
@@ -154,18 +83,16 @@ namespace LK_Ugrumiy_WP.Content.NPCs
                         NPC.damage = 40;
                         NPC.aiStyle = NPCAIStyleID.Fighter;
 
-                        // Сообщение только один раз
-                        if (NPC.aiAction == 0)
+                        if (NPC.localAI[0] == 0f)
                         {
                             string msg = Language.GetTextValue("Mods.LK_Ugrumiy_WP.Dialogue.JohnNPC.AngryChat");
                             Main.NewText(msg, 255, 100, 100);
-                            NPC.aiAction = 1;
+                            NPC.localAI[0] = 1f;
                         }
                         break;
                     }
                 }
             }
-            return true;
         }
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)

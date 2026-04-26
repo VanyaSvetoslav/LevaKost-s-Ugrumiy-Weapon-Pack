@@ -1,4 +1,4 @@
-using Terraria;
+п»їusing Terraria;
 using Terraria.ID;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -7,9 +7,9 @@ using Microsoft.Xna.Framework;
 namespace LK_Ugrumiy_WP.Content.Items.Weapons
 {
 	/// <summary>
-	/// Слизневая мини-акула: автоматическое оружие с высокой скорострельностью.
-	/// Стреляет каплями белой слизи, как Minishark — пулями.
-	/// 33% шанс не потратить выстрел.
+	/// РЎР»РёР·РЅРµРІР°СЏ РјРёРЅРё-Р°РєСѓР»Р°: Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ РѕСЂСѓР¶РёРµ СЃ РІС‹СЃРѕРєРѕР№ СЃРєРѕСЂРѕСЃС‚СЂРµР»СЊРЅРѕСЃС‚СЊСЋ.
+	/// РЎС‚СЂРµР»СЏРµС‚ РєР°РїР»СЏРјРё Р±РµР»РѕР№ СЃР»РёР·Рё, РєР°Рє Minishark вЂ” РїСѓР»СЏРјРё.
+	/// РќРµ С‚СЂРµР±СѓРµС‚ Р±РѕРµРїСЂРёРїР°СЃРѕРІ.
 	/// </summary>
 	public class SlimeMinigun : ModItem
 	{
@@ -59,11 +59,6 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons
 			);
 
 			return false;
-		}
-
-		public override bool CanConsumeAmmo(Item ammo, Player player)
-		{
-			return Main.rand.NextFloat() > 0.33f;
 		}
 
 		public override Vector2? HoldoutOffset()

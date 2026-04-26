@@ -1,18 +1,20 @@
-using System;
+п»їusing System;
 using Terraria;
 using Terraria.ID;
+using Terraria.Chat;
 using Terraria.DataStructures;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace LK_Ugrumiy_WP.Content.Items.Consumables
 {
 	/// <summary>
-	/// Конфета-рулетка: выглядит безобидно, но таит в себе сюрпризы.
-	/// 55% — хил 67000 HP, 30% — взрыв, 15% — мгновенная смерть + анекдот.
+	/// РљРѕРЅС„РµС‚Р°-СЂСѓР»РµС‚РєР°: РІС‹РіР»СЏРґРёС‚ Р±РµР·РѕР±РёРґРЅРѕ, РЅРѕ С‚Р°РёС‚ РІ СЃРµР±Рµ СЃСЋСЂРїСЂРёР·С‹.
+	/// 55% вЂ” С…РёР» 67000 HP, 30% вЂ” РІР·СЂС‹РІ, 15% вЂ” РјРіРЅРѕРІРµРЅРЅР°СЏ СЃРјРµСЂС‚СЊ + Р°РЅРµРєРґРѕС‚.
 	/// </summary>
 	public class SpookyCandy : ModItem
 	{
-		// Путь к собственному спрайту в подпапке
+		// РџСѓС‚СЊ Рє СЃРѕР±СЃС‚РІРµРЅРЅРѕРјСѓ СЃРїСЂР°Р№С‚Сѓ РІ РїРѕРґРїР°РїРєРµ
 		public override string Texture => "LK_Ugrumiy_WP/Content/Items/Consumables/SpookyCandy/SpookyCandy";
 
 		public override void SetDefaults()
@@ -34,21 +36,21 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 			if (player.whoAmI != Main.myPlayer)
 				return true;
 
-			int roll = Main.rand.Next(100); // 0–99
+			int roll = Main.rand.Next(100); // 0вЂ“99
 
 			if (roll < 55)
 			{
-				// === 55%: Мега-хил ===
+				// === 55%: РњРµРіР°-С…РёР» ===
 				DoMegaHeal(player);
 			}
 			else if (roll < 85)
 			{
-				// === 30%: Взрыв ===
+				// === 30%: Р’Р·СЂС‹РІ ===
 				DoExplosion(player);
 			}
 			else
 			{
-				// === 15%: Мгновенная смерть + анекдот ===
+				// === 15%: РњРіРЅРѕРІРµРЅРЅР°СЏ СЃРјРµСЂС‚СЊ + Р°РЅРµРєРґРѕС‚ ===
 				DoInstantDeath(player);
 			}
 
@@ -63,7 +65,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 
 			Main.NewText("The candy fills you with overwhelming energy!", 50, 255, 100);
 
-			// Зелёные искры
+			// Р—РµР»С‘РЅС‹Рµ РёСЃРєСЂС‹
 			for (int i = 0; i < 30; i++)
 			{
 				Dust.NewDust(player.position, player.width, player.height,
@@ -76,7 +78,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 		{
 			Main.NewText("The candy... was a firecracker?!", 255, 150, 50);
 
-			// Визуальный взрыв
+			// Р’РёР·СѓР°Р»СЊРЅС‹Р№ РІР·СЂС‹РІ
 			for (int i = 0; i < 50; i++)
 			{
 				Dust.NewDust(player.position, player.width, player.height,
@@ -90,13 +92,13 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 					100, default, 1.8f);
 			}
 
-			// Настоящий снаряд-взрыв (урон игроку)
+			// РќР°СЃС‚РѕСЏС‰РёР№ СЃРЅР°СЂСЏРґ-РІР·СЂС‹РІ (СѓСЂРѕРЅ РёРіСЂРѕРєСѓ)
 			Projectile.NewProjectile(
 				player.GetSource_ItemUse(player.HeldItem),
 				player.Center,
 				Microsoft.Xna.Framework.Vector2.Zero,
 				ProjectileID.Explosives,
-				67000, // урон
+				67000, // СѓСЂРѕРЅ
 				10f,
 				player.whoAmI
 			);
@@ -104,20 +106,20 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 
 		private void DoInstantDeath(Player player)
 		{
-			// Сначала анекдот, потом смерть
+			// РЎРЅР°С‡Р°Р»Р° Р°РЅРµРєРґРѕС‚, РїРѕС‚РѕРј СЃРјРµСЂС‚СЊ
 			string joke = GetRandomCandyJoke();
 			Main.NewText(joke, 255, 80, 200);
 
-			// Убиваем игрока
+			// РЈР±РёРІР°РµРј РёРіСЂРѕРєР°
 			player.KillMe(
-				PlayerDeathReason.ByCustomReason($"{player.name} shouldn't have eaten that candy..."),
+				PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral($"{player.name} shouldn't have eaten that candy...")),
 				999999,
 				0
 			);
 		}
 
 		/// <summary>
-		/// Рандомные тупые анекдоты про конфеты.
+		/// Р Р°РЅРґРѕРјРЅС‹Рµ С‚СѓРїС‹Рµ Р°РЅРµРєРґРѕС‚С‹ РїСЂРѕ РєРѕРЅС„РµС‚С‹.
 		/// </summary>
 		private static string GetRandomCandyJoke()
 		{
@@ -156,7 +158,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 				.AddTile(TileID.CookingPots)
 				.Register();
 
-			// Альтернативный рецепт на Хэллоуин
+			// РђР»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹Р№ СЂРµС†РµРїС‚ РЅР° РҐСЌР»Р»РѕСѓРёРЅ
 			CreateRecipe(10)
 				.AddIngredient(ItemID.GoodieBag, 1)
 				.AddTile(TileID.WorkBenches)

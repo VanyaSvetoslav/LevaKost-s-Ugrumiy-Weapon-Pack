@@ -332,7 +332,7 @@ namespace LK_Ugrumiy_WP.Content.Accessories
 			for (int i = 0; i < 10; i++)
 			{
 				Item item = player.inventory[i];
-				if (!item.active || item.damage <= 0 || item.accessory || item.createTile >= 0)
+				if (!item.active || item.damage <= 0 || item.accessory || item.createTile >= TileID.Dirt)
 					continue;
 
 				int score = item.damage;

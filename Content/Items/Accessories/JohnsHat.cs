@@ -1,6 +1,7 @@
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
+using LK_Ugrumiy_WP.Common.Systems;
 
 namespace LK_Ugrumiy_WP.Content.Items.Accessories
 {
@@ -41,8 +42,10 @@ namespace LK_Ugrumiy_WP.Content.Items.Accessories
         public override void ResetEffects()
         {
             wearingJohnsHat = false;
+        }
 
-            // Обновляем глобальную систему
+        public override void PostUpdateEquips()
+        {
             var johnSystem = ModContent.GetInstance<JohnHatSystem>();
             johnSystem.playerWearingHat[Player.whoAmI] = wearingJohnsHat;
         }

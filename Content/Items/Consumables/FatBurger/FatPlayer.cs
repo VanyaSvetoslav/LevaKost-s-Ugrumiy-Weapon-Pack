@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -60,40 +60,40 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 
 			float burnRate = 0f;
 
-			// Áàçîâîå ñæèãàíèå: âñåãäà òèêàåò (î÷åíü ìåäëåííî)
-			burnRate += 0.001f; // ~0.06/ñåê, ~3.6/ìèí
+			// Ð‘Ð°Ð·Ð¾Ð²Ð¾Ðµ ÑÐ¶Ð¸Ð³Ð°Ð½Ð¸Ðµ: Ð²ÑÐµÐ³Ð´Ð° Ñ‚Ð¸ÐºÐ°ÐµÑ‚ (Ð¾Ñ‡ÐµÐ½ÑŒ Ð¼ÐµÐ´Ð»ÐµÐ½Ð½Ð¾)
+			burnRate += 0.001f; // ~0.06/ÑÐµÐº, ~3.6/Ð¼Ð¸Ð½
 
-			// Áåã: áûñòðî ñæèãàåò
+			// Ð‘ÐµÐ³: Ð±Ñ‹ÑÑ‚Ñ€Ð¾ ÑÐ¶Ð¸Ð³Ð°ÐµÑ‚
 			if (Math.Abs(Player.velocity.X) > 2f && Player.velocity.Y == 0f)
 			{
-				burnRate += 0.015f; // ~0.48/ñåê, ~28.8/ìèí
+				burnRate += 0.015f; // ~0.48/ÑÐµÐº, ~28.8/Ð¼Ð¸Ð½
 			}
 
-			// Ñïðèíò (áûñòðûé áåã)
+			// Ð¡Ð¿Ñ€Ð¸Ð½Ñ‚ (Ð±Ñ‹ÑÑ‚Ñ€Ñ‹Ð¹ Ð±ÐµÐ³)
 			if (Math.Abs(Player.velocity.X) > 5f)
 			{
-				burnRate += 0.012f; // åù¸ áûñòðåå
+				burnRate += 0.012f; // ÐµÑ‰Ñ‘ Ð±Ñ‹ÑÑ‚Ñ€ÐµÐµ
 			}
 
-			// Ïðûæêè
+			// ÐŸÑ€Ñ‹Ð¶ÐºÐ¸
 			if (Player.jump > 0 || Player.velocity.Y < -2f)
 			{
 				burnRate += 0.005f;
 			}
 
-			// Áîé (åñëè èãðîê àòàêóåò)
+			// Ð‘Ð¾Ð¹ (ÐµÑÐ»Ð¸ Ð¸Ð³Ñ€Ð¾Ðº Ð°Ñ‚Ð°ÐºÑƒÐµÑ‚)
 			if (Player.itemAnimation > 0)
 			{
 				burnRate += 0.004f;
 			}
 
-			// Ïëàâàíèå
+			// ÐŸÐ»Ð°Ð²Ð°Ð½Ð¸Ðµ
 			if (Player.wet && !Player.lavaWet)
 			{
 				burnRate += 0.01f;
 			}
 
-			// Íàêàïëèâàåì è ïðèìåíÿåì
+			// ÐÐ°ÐºÐ°Ð¿Ð»Ð¸Ð²Ð°ÐµÐ¼ Ð¸ Ð¿Ñ€Ð¸Ð¼ÐµÐ½ÑÐµÐ¼
 			burnAccumulator += burnRate;
 
 			if (burnAccumulator >= 1f)
@@ -102,7 +102,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 				FatLevel = Math.Max(0f, FatLevel - toLose);
 				burnAccumulator -= toLose;
 
-				// Óâåäîìëåíèå ïðè ïåðåõîäå íà ñòàäèþ íèæå
+				// Ð£Ð²ÐµÐ´Ð¾Ð¼Ð»ÐµÐ½Ð¸Ðµ Ð¿Ñ€Ð¸ Ð¿ÐµÑ€ÐµÑ…Ð¾Ð´Ðµ Ð½Ð° ÑÑ‚Ð°Ð´Ð¸ÑŽ Ð½Ð¸Ð¶Ðµ
 				if (FatLevel > 0 && (int)(FatLevel + toLose) / 10 != (int)FatLevel / 10)
 				{
 					Main.NewText($"Burning fat! ({(int)FatLevel}/{(int)MaxFat})", 150, 255, 150);
@@ -116,11 +116,11 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 
 			float ratio = FatLevel / MaxFat;
 
-			Player.moveSpeed *= 1f - (ratio * 0.4f);
+			Player.moveSpeed *= Math.Max(0.2f, 1f - (ratio * 0.4f));
 			Player.jumpSpeedBoost -= ratio * 2f;
 
 			if (FatLevel > 50f)
-				Player.GetAttackSpeed(DamageClass.Generic) -= ratio * 0.15f;
+				Player.GetAttackSpeed(DamageClass.Generic) *= Math.Max(0.5f, 1f - ratio * 0.15f);
 
 			Player.statLifeMax2 += (int)(ratio * 60f);
 			Player.statDefense += (int)(ratio * 10f);

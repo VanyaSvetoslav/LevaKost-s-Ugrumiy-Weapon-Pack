@@ -1,0 +1,67 @@
+name: Release Mod
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Версия релиза (например 0.1.1)"
+        required: true
+        default: "0.1.1"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout mod source
+        uses: actions/checkout@v4
+        with:
+          path: LK_Ugrumiy_WP
+
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Download tModLoader
+        run: |
+          curl -sL "https://github.com/tModLoader/tModLoader/releases/latest/download/tModLoader.zip" -o /tmp/tModLoader.zip
+          unzip -qo /tmp/tModLoader.zip -d "$GITHUB_WORKSPACE"
+
+      - name: Setup tModLoader.targets
+        run: cp "$GITHUB_WORKSPACE/tMLMod.targets" "$GITHUB_WORKSPACE/tModLoader.targets"
+
+      - name: Build mod
+        run: dotnet build
+        working-directory: LK_Ugrumiy_WP
+        env:
+          LD_LIBRARY_PATH: ${{ github.workspace }}/Libraries/Native/Linux
+
+      - name: Find .tmod file
+        id: find_tmod
+        run: |
+          TMOD_PATH=$(find ~/.local/share/Terraria/tModLoader/Mods -name "*.tmod" | head -1)
+          echo "tmod_path=$TMOD_PATH" >> "$GITHUB_OUTPUT"
+          TMOD_NAME=$(basename "$TMOD_PATH")
+          echo "tmod_name=$TMOD_NAME" >> "$GITHUB_OUTPUT"
+          echo "Found: $TMOD_PATH"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: v${{ github.event.inputs.version }}
+          body: |
+            ## LevaKost's Ugrumiy Weapon Pack v${{ github.event.inputs.version }}
+
+            ### Установка
+            1. Скачайте `.tmod` файл из Assets ниже
+            2. Поместите его в папку `Documents/My Games/Terraria/tModLoader/Mods/`
+            3. Включите мод в tModLoader и перезагрузите
+
+            Собрано автоматически из ветки `main` (коммит ${{ github.sha }}).
+          files: ${{ steps.find_tmod.outputs.tmod_path }}
+          fail_on_unmatched_files: true

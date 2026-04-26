@@ -1,4 +1,4 @@
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using LK_Ugrumiy_WP.Content.Items.Consumables;
@@ -7,8 +7,6 @@ namespace LK_Ugrumiy_WP.Common.Systems
 {
     public class CherryDropSystem : GlobalNPC
     {
-        public override bool InstancePerEntity => true;
-
         public override void OnKill(NPC npc)
         {
             if (!Main.hardMode || !NPC.downedPlantBoss)

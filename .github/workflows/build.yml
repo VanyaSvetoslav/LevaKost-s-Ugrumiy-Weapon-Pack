@@ -1,0 +1,36 @@
+name: Build Mod
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout mod source
+        uses: actions/checkout@v4
+        with:
+          path: LK_Ugrumiy_WP
+
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Download tModLoader
+        run: |
+          curl -sL "https://github.com/tModLoader/tModLoader/releases/latest/download/tModLoader.zip" -o /tmp/tModLoader.zip
+          unzip -qo /tmp/tModLoader.zip -d "$GITHUB_WORKSPACE"
+
+      - name: Setup tModLoader.targets
+        run: cp "$GITHUB_WORKSPACE/tMLMod.targets" "$GITHUB_WORKSPACE/tModLoader.targets"
+
+      - name: Build mod
+        run: dotnet build --warnaserror
+        working-directory: LK_Ugrumiy_WP
+        env:
+          LD_LIBRARY_PATH: ${{ github.workspace }}/Libraries/Native/Linux

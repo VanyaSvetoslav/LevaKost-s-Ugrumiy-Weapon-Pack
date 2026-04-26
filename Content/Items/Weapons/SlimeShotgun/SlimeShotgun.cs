@@ -1,4 +1,4 @@
-using Terraria;
+п»їusing Terraria;
 using Terraria.ID;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -7,8 +7,8 @@ using Microsoft.Xna.Framework;
 namespace LK_Ugrumiy_WP.Content.Items.Weapons
 {
 	/// <summary>
-	/// Дробовик, стреляющий веером из капель склизкой белой жидкости.
-	/// При попадании в поверхность жидкость растекается лужей, замедляя врагов.
+	/// Р”СЂРѕР±РѕРІРёРє, СЃС‚СЂРµР»СЏСЋС‰РёР№ РІРµРµСЂРѕРј РёР· РєР°РїРµР»СЊ СЃРєР»РёР·РєРѕР№ Р±РµР»РѕР№ Р¶РёРґРєРѕСЃС‚Рё.
+	/// РџСЂРё РїРѕРїР°РґР°РЅРёРё РІ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ Р¶РёРґРєРѕСЃС‚СЊ СЂР°СЃС‚РµРєР°РµС‚СЃСЏ Р»СѓР¶РµР№, Р·Р°РјРµРґР»СЏСЏ РІСЂР°РіРѕРІ.
 	/// </summary>
 	public class SlimeShotgun : ModItem
 	{
@@ -16,30 +16,30 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons
 
 		public override void SetDefaults()
 		{
-			// Тип — огнестрельное оружие
+			// РўРёРї вЂ” РѕРіРЅРµСЃС‚СЂРµР»СЊРЅРѕРµ РѕСЂСѓР¶РёРµ
 			Item.DamageType = DamageClass.Ranged;
 			Item.damage = 28;
 			Item.knockBack = 4f;
 			Item.crit = 4;
 
-			// Скорость и анимация (как у дробовика Terraria)
+			// РЎРєРѕСЂРѕСЃС‚СЊ Рё Р°РЅРёРјР°С†РёСЏ (РєР°Рє Сѓ РґСЂРѕР±РѕРІРёРєР° Terraria)
 			Item.shootSpeed = 10f;
 			Item.useAnimation = 36;
 			Item.useTime = 36;
 			Item.useStyle = ItemUseStyleID.Shoot;
 
-			// Снаряд — капля слизи
+			// РЎРЅР°СЂСЏРґ вЂ” РєР°РїР»СЏ СЃР»РёР·Рё
 			Item.shoot = ModContent.ProjectileType<Projectiles.SlimeGlob>();
-			Item.useAmmo = AmmoID.None; // Не требует патронов
+			Item.useAmmo = AmmoID.None; // РќРµ С‚СЂРµР±СѓРµС‚ РїР°С‚СЂРѕРЅРѕРІ
 
-			// Размеры и редкость
+			// Р Р°Р·РјРµСЂС‹ Рё СЂРµРґРєРѕСЃС‚СЊ
 			Item.width = 44;
 			Item.height = 18;
 			Item.rare = ItemRarityID.Orange;
 			Item.value = Item.buyPrice(gold: 5);
 
-			// Звук выстрела
-			Item.UseSound = SoundID.Item36; // звук дробовика
+			// Р—РІСѓРє РІС‹СЃС‚СЂРµР»Р°
+			Item.UseSound = SoundID.Item36; // Р·РІСѓРє РґСЂРѕР±РѕРІРёРєР°
 
 			Item.autoReuse = false;
 			Item.noMelee = true;
@@ -47,12 +47,12 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons
 
 		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
 		{
-			int pelletCount = 5; // количество «капель» в залпе
-			float spreadAngle = MathHelper.ToRadians(18f); // общий разброс
+			int pelletCount = 5; // РєРѕР»РёС‡РµСЃС‚РІРѕ В«РєР°РїРµР»СЊВ» РІ Р·Р°Р»РїРµ
+			float spreadAngle = MathHelper.ToRadians(18f); // РѕР±С‰РёР№ СЂР°Р·Р±СЂРѕСЃ
 
 			for (int i = 0; i < pelletCount; i++)
 			{
-				// Случайное отклонение для каждой капли
+				// РЎР»СѓС‡Р°Р№РЅРѕРµ РѕС‚РєР»РѕРЅРµРЅРёРµ РґР»СЏ РєР°Р¶РґРѕР№ РєР°РїР»Рё
 				float angle = velocity.ToRotation() + Main.rand.NextFloat(-spreadAngle, spreadAngle);
 				float speed = velocity.Length() * Main.rand.NextFloat(0.85f, 1.15f);
 				Vector2 pelletVelocity = angle.ToRotationVector2() * speed;
@@ -68,7 +68,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons
 				);
 			}
 
-			return false; // мы сами создали снаряды
+			return false; // РјС‹ СЃР°РјРё СЃРѕР·РґР°Р»Рё СЃРЅР°СЂСЏРґС‹
 		}
 
 		public override Vector2? HoldoutOffset()
@@ -78,11 +78,11 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons
 
 		public override void AddRecipes()
 		{
-            CreateRecipe()
-                .AddIngredient(ItemID.Boomstick, 1)
-                .AddIngredient(ModContent.ItemType<Consumables.CowMilk>(), 3)
-                .AddTile(TileID.Anvils)
-                .Register();
-        }
+			CreateRecipe()
+				.AddIngredient(ItemID.Boomstick, 1)
+				.AddIngredient(ModContent.ItemType<Consumables.CowMilk>(), 3)
+				.AddTile(TileID.Anvils)
+				.Register();
+		}
 	}
 }

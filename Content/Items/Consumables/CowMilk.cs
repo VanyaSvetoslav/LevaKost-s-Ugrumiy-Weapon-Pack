@@ -1,17 +1,17 @@
-using Terraria;
+п»їusing Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace LK_Ugrumiy_WP.Content.Items.Consumables
 {
 	/// <summary>
-	/// Молоко, полученное от "коровы" (которая бык).
-	/// Восстанавливает HP и даёт небольшой бафф.
-	/// Также используется как материал для крафта.
+	/// РњРѕР»РѕРєРѕ, РїРѕР»СѓС‡РµРЅРЅРѕРµ РѕС‚ "РєРѕСЂРѕРІС‹" (РєРѕС‚РѕСЂР°СЏ Р±С‹Рє).
+	/// Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ HP Рё РґР°С‘С‚ РЅРµР±РѕР»СЊС€РѕР№ Р±Р°С„С„.
+	/// РўР°РєР¶Рµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РєР°Рє РјР°С‚РµСЂРёР°Р» РґР»СЏ РєСЂР°С„С‚Р°.
 	/// </summary>
 	public class CowMilk : ModItem
 	{
-		// Собственный спрайт молока
+		// РЎРѕР±СЃС‚РІРµРЅРЅС‹Р№ СЃРїСЂР°Р№С‚ РјРѕР»РѕРєР°
 		public override string Texture => "LK_Ugrumiy_WP/Content/Items/Consumables/CowMilk";
 
 		public override void SetDefaults()
@@ -29,7 +29,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 			Item.healLife = 50;
 			Item.potion = false;
 
-			// Делаем предмет материалом для крафта
+			// Р”РµР»Р°РµРј РїСЂРµРґРјРµС‚ РјР°С‚РµСЂРёР°Р»РѕРј РґР»СЏ РєСЂР°С„С‚Р°
 			Item.material = true;
 		}
 

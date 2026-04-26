@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+п»їusing System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
@@ -9,21 +9,21 @@ using Terraria.Utilities;
 namespace LK_Ugrumiy_WP.Content.NPCs
 {
 	/// <summary>
-	/// NPC-корова. Выглядит как корова, но в диалогах утверждает, что он бык.
-	/// Даёт молоко по кнопке "Grab Milk".
-	/// Приходит только если у игрока в инвентаре есть 1+ сена (Hay).
+	/// NPC-РєРѕСЂРѕРІР°. Р’С‹РіР»СЏРґРёС‚ РєР°Рє РєРѕСЂРѕРІР°, РЅРѕ РІ РґРёР°Р»РѕРіР°С… СѓС‚РІРµСЂР¶РґР°РµС‚, С‡С‚Рѕ РѕРЅ Р±С‹Рє.
+	/// Р”Р°С‘С‚ РјРѕР»РѕРєРѕ РїРѕ РєРЅРѕРїРєРµ "Grab Milk".
+	/// РџСЂРёС…РѕРґРёС‚ С‚РѕР»СЊРєРѕ РµСЃР»Рё Сѓ РёРіСЂРѕРєР° РІ РёРЅРІРµРЅС‚Р°СЂРµ РµСЃС‚СЊ 1+ СЃРµРЅР° (Hay).
 	/// </summary>
 	[AutoloadHead]
 	public class CowNPC : ModNPC
 	{
-		// Собственный спрайтшит коровы (25 фреймов)
+		// РЎРѕР±СЃС‚РІРµРЅРЅС‹Р№ СЃРїСЂР°Р№С‚С€РёС‚ РєРѕСЂРѕРІС‹ (25 С„СЂРµР№РјРѕРІ)
 		public override string Texture => "LK_Ugrumiy_WP/Content/NPCs/CowNPC";
 
 		public override LocalizedText DisplayName => Language.GetOrRegister(
 			"Mods.LK_Ugrumiy_WP.NPCs.CowNPC.DisplayName",
 			() => "Cow");
 
-		/// <summary>Кулдаун выдачи молока (в тиках).</summary>
+		/// <summary>РљСѓР»РґР°СѓРЅ РІС‹РґР°С‡Рё РјРѕР»РѕРєР° (РІ С‚РёРєР°С…).</summary>
 		private int milkCooldown = 0;
 
 		public override void SetStaticDefaults()
@@ -38,7 +38,7 @@ namespace LK_Ugrumiy_WP.Content.NPCs
 			NPCID.Sets.AttackAverageChance[Type] = 30;
 			NPCID.Sets.HatOffsetY[Type] = 4;
 
-			// Важно для корректной работы городского NPC
+			// Р’Р°Р¶РЅРѕ РґР»СЏ РєРѕСЂСЂРµРєС‚РЅРѕР№ СЂР°Р±РѕС‚С‹ РіРѕСЂРѕРґСЃРєРѕРіРѕ NPC
 			NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers()
 			{
 				Velocity = 1f
@@ -59,11 +59,7 @@ namespace LK_Ugrumiy_WP.Content.NPCs
 			NPC.friendly = true;
 			NPC.townNPC = true;
 
-			AIType = NPCID.Guide;
 			AnimationType = NPCID.Guide;
-
-			// Назначаем голову для миникарты
-			NPC.aiStyle = NPCAIStyleID.Passive;
 		}
 
 		public override bool CanTownNPCSpawn(int numTownNPCs)
@@ -126,7 +122,7 @@ namespace LK_Ugrumiy_WP.Content.NPCs
 
 		public override void SetChatButtons(ref string button, ref string button2)
 		{
-			button = "Grab Milk";
+			button = Language.GetTextValue("Mods.LK_Ugrumiy_WP.UI.GrabMilk");
 		}
 
 		public override void OnChatButtonClicked(bool firstButton, ref string shop)

@@ -1,11 +1,11 @@
-using Terraria;
+п»їusing Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace LK_Ugrumiy_WP.Content.Items.Consumables
 {
 	/// <summary>
-	/// Колокольчик для призыва коровы. Для тестирования.
+	/// РљРѕР»РѕРєРѕР»СЊС‡РёРє РґР»СЏ РїСЂРёР·С‹РІР° РєРѕСЂРѕРІС‹. Р”Р»СЏ С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ.
 	/// </summary>
 	public class CowBell : ModItem
 	{
@@ -30,7 +30,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 			{
 				int npcType = ModContent.NPCType<NPCs.CowNPC>();
 
-				// Спавним корову рядом с игроком
+				// РЎРїР°РІРЅРёРј РєРѕСЂРѕРІСѓ СЂСЏРґРѕРј СЃ РёРіСЂРѕРєРѕРј
 				NPC.NewNPC(
 					player.GetSource_ItemUse(Item),
 					(int)player.Center.X + 100,

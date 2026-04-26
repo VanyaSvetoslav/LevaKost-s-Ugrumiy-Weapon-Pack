@@ -1,8 +1,7 @@
-Mods: {
+﻿Mods: {
 	LK_Ugrumiy_WP: {
 		NPCs: {
 			JohnNPC: {
-				DeathMessage: Mods.LK_Ugrumiy_WP.NPCs.JohnNPC.DeathMessage
 				DisplayName: John
 			}
 
@@ -23,6 +22,14 @@ Mods: {
 		}
 
 		Dialogue: {
+			JohnNPC: {
+				Angry: That's MY hat! Give it back or I'll take it by force!
+				AngryChat: John doesn't like that you're wearing his hat...
+				Standard1: The caves... they change a man. Trust me.
+				Standard2: I've seen things down here you wouldn't believe.
+				Standard3: Don't mind me. Just passing through.
+			}
+
 			CowNPC: {
 				Standard1: Moo... I mean, SNORT! I'm a BULL, got it?
 				Standard2: Stop calling me a cow. Do I LOOK like a cow to you?! ...Don't answer that.
@@ -38,7 +45,10 @@ Mods: {
 			}
 		}
 
-		Bestiary.CowNPC: A 'cow' that insists it's actually a bull. Provides milk if you have hay. Don't ask where the milk comes from.
+		Bestiary: {
+			CowNPC: A 'cow' that insists it's actually a bull. Provides milk if you have hay. Don't ask where the milk comes from.
+			JohnNPC: A grizzled old man who wanders the caverns alone. He's very attached to his hat. Don't wear it around him.
+		}
 
 		Items: {
 			ibp3000: {
@@ -153,6 +163,10 @@ Mods: {
 				DisplayName: Cherry Cooldown
 				Description: You can't eat another cherry yet...
 			}
+		}
+
+		UI: {
+			GrabMilk: Grab Milk
 		}
 
 		Projectiles: {

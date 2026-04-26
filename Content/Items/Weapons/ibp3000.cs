@@ -1,4 +1,4 @@
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -9,7 +9,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons
         public override void SetDefaults()
         {
             // Тип предмета - метательный
-            Item.DamageType = DamageClass.Throwing;
+            Item.DamageType = DamageClass.Ranged;
             Item.damage = 69;
             Item.knockBack = 6f;
             Item.crit = 4;

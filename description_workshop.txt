@@ -1,1 +1,15 @@
-This description will show up on the steam page, check out https://steamcommunity.com/comment/Guide/formattinghelp.
+LevaKost's Ugrumiy Weapon Pack — a Terraria content mod by LelaPo & Kotya.
+
+[h1]Features[/h1]
+[list]
+[*] Slime Shotgun & Slime Minigun — slime-based ranged weapons that leave puddles slowing enemies
+[*] IBP-3000 — throwable explosive projectile with fire trail
+[*] Fat Burger system — eat burgers to gain fat (defense & HP bonuses, but slower movement), use Diet Pills to slim down
+[*] Spooky Candy — gambling consumable: 55% mega-heal, 30% explosion, 15% instant death with a joke
+[*] Cherry — ultra-rare full HP restore with cooldown
+[*] Cow NPC — a town "bull" that provides milk
+[*] John NPC — rare cavern dweller; steal his hat and he'll fight you for it
+[*] Cursed Bandle — AI-controlled accessory using Q-Learning that takes over your character
+[/list]
+
+Supports English and Russian localization.

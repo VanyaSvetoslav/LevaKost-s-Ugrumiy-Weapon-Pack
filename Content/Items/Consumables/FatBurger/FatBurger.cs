@@ -1,16 +1,16 @@
-using Terraria;
+п»їusing Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace LK_Ugrumiy_WP.Content.Items.Consumables
 {
 	/// <summary>
-	/// Бургер: при каждом съедении увеличивает уровень жира.
-	/// Персонаж постепенно толстеет, получает бонусы и штрафы.
+	/// Р‘СѓСЂРіРµСЂ: РїСЂРё РєР°Р¶РґРѕРј СЃСЉРµРґРµРЅРёРё СѓРІРµР»РёС‡РёРІР°РµС‚ СѓСЂРѕРІРµРЅСЊ Р¶РёСЂР°.
+	/// РџРµСЂСЃРѕРЅР°Р¶ РїРѕСЃС‚РµРїРµРЅРЅРѕ С‚РѕР»СЃС‚РµРµС‚, РїРѕР»СѓС‡Р°РµС‚ Р±РѕРЅСѓСЃС‹ Рё С€С‚СЂР°С„С‹.
 	/// </summary>
 	public class FatBurger : ModItem
 	{
-		// Путь к собственной текстуре бургера
+		// РџСѓС‚СЊ Рє СЃРѕР±СЃС‚РІРµРЅРЅРѕР№ С‚РµРєСЃС‚СѓСЂРµ Р±СѓСЂРіРµСЂР°
 		public override string Texture => "LK_Ugrumiy_WP/Content/Items/Consumables/FatBurger/Burger_Zhirnosti";
 
 		public override void SetDefaults()
@@ -74,7 +74,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 	}
 
 	/// <summary>
-	/// Диетическая таблетка: снижает жир.
+	/// Р”РёРµС‚РёС‡РµСЃРєР°СЏ С‚Р°Р±Р»РµС‚РєР°: СЃРЅРёР¶Р°РµС‚ Р¶РёСЂ.
 	/// </summary>
 	public class DietPill : ModItem
 	{

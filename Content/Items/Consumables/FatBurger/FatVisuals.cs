@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -45,7 +45,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 	{
 		public override Position GetDefaultPosition()
 		{
-			// AfterParent(HeldItem) — один из последних слоёв отрисовки
+			// AfterParent(HeldItem) вЂ” РѕРґРёРЅ РёР· РїРѕСЃР»РµРґРЅРёС… СЃР»РѕС‘РІ РѕС‚СЂРёСЃРѕРІРєРё
 			return new AfterParent(PlayerDrawLayers.HeldItem);
 		}
 

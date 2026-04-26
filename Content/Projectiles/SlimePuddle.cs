@@ -1,3 +1,4 @@
+п»їusing System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -7,21 +8,21 @@ using Microsoft.Xna.Framework.Graphics;
 namespace LK_Ugrumiy_WP.Content.Projectiles
 {
 	/// <summary>
-	/// Лужа белой слизи: появляется при столкновении SlimeGlob с тайлом.
-	/// Растекается в ширину, замедляет врагов, стоящих на ней, затем исчезает.
+	/// Р›СѓР¶Р° Р±РµР»РѕР№ СЃР»РёР·Рё: РїРѕСЏРІР»СЏРµС‚СЃСЏ РїСЂРё СЃС‚РѕР»РєРЅРѕРІРµРЅРёРё SlimeGlob СЃ С‚Р°Р№Р»РѕРј.
+	/// Р Р°СЃС‚РµРєР°РµС‚СЃСЏ РІ С€РёСЂРёРЅСѓ, Р·Р°РјРµРґР»СЏРµС‚ РІСЂР°РіРѕРІ, СЃС‚РѕСЏС‰РёС… РЅР° РЅРµР№, Р·Р°С‚РµРј РёСЃС‡РµР·Р°РµС‚.
 	/// </summary>
 	public class SlimePuddle : ModProjectile
 	{
-		// Используем спрайт снежка — белый, нейтральный
+		// РСЃРїРѕР»СЊР·СѓРµРј СЃРїСЂР°Р№С‚ СЃРЅРµР¶РєР° вЂ” Р±РµР»С‹Р№, РЅРµР№С‚СЂР°Р»СЊРЅС‹Р№
 		public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.SnowBallFriendly;
 
-		/// <summary>Текущая ширина лужи (растёт со временем).</summary>
+		/// <summary>РўРµРєСѓС‰Р°СЏ С€РёСЂРёРЅР° Р»СѓР¶Рё (СЂР°СЃС‚С‘С‚ СЃРѕ РІСЂРµРјРµРЅРµРј).</summary>
 		private float puddleWidth = 8f;
 
-		/// <summary>Максимальная ширина, до которой лужа растекается.</summary>
+		/// <summary>РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ С€РёСЂРёРЅР°, РґРѕ РєРѕС‚РѕСЂРѕР№ Р»СѓР¶Р° СЂР°СЃС‚РµРєР°РµС‚СЃСЏ.</summary>
 		private const float MaxPuddleWidth = 80f;
 
-		/// <summary>Скорость растекания в пикселях за тик.</summary>
+		/// <summary>РЎРєРѕСЂРѕСЃС‚СЊ СЂР°СЃС‚РµРєР°РЅРёСЏ РІ РїРёРєСЃРµР»СЏС… Р·Р° С‚РёРє.</summary>
 		private const float SpreadSpeed = 1.5f;
 
 		public override void SetDefaults()
@@ -113,6 +114,16 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
 				12
 			);
 			return puddleRect.Intersects(targetHitbox);
+		}
+
+		public override void SendExtraAI(BinaryWriter writer)
+		{
+			writer.Write(puddleWidth);
+		}
+
+		public override void ReceiveExtraAI(BinaryReader reader)
+		{
+			puddleWidth = reader.ReadSingle();
 		}
 
 		public override bool PreDraw(ref Color lightColor)
