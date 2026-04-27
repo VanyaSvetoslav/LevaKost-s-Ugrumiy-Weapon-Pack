@@ -19,6 +19,21 @@
 					Princess_LovesNPC: I like {NPCName}.
 				}
 			}
+
+			MechanicMerriweatherNPC: {
+				DisplayName: Mechanic-Merriweather
+
+				TownNPCMood: {
+					Content: The wires are humming, all is well.
+					NoHome: I can't build anything without a workshop!
+					FarFromHome: I am too far from my workbench.
+					LoveSpace: So much room for cables and traps!
+					DislikeCrowded: Too many bodies tripping on my wiring.
+					HateCrowded: I can't hear myself solder in this crowd!
+					LikeNPC_Princess: I like {NPCName}.
+					Princess_LovesNPC: I like {NPCName}.
+				}
+			}
 		}
 
 		Dialogue: {
@@ -28,6 +43,15 @@
 				Standard1: The caves... they change a man. Trust me.
 				Standard2: I've seen things down here you wouldn't believe.
 				Standard3: Don't mind me. Just passing through.
+			}
+
+			MechanicMerriweatherNPC: {
+				Standard1: Name's Merriweather. If it's wired, I can fix it.
+				Standard2: Don't touch the red wire. Unless you want to, then go ahead.
+				Standard3: The old Mechanic got lost in the dungeon. My rates are better anyway.
+				Standard4: Actuators, pressure plates, switches — I sell all the fun stuff.
+				Standard5: Wall of Flesh went down and here I am. Coincidence? Probably not.
+				Rare: Between you and me — one of those Mechanical bosses is watching us right now.
 			}
 
 			CowNPC: {
@@ -48,6 +72,7 @@
 		Bestiary: {
 			CowNPC: A 'cow' that insists it's actually a bull. Provides milk if you have hay. Don't ask where the milk comes from.
 			JohnNPC: A grizzled old man who wanders the caverns alone. He's very attached to his hat. Don't wear it around him.
+			MechanicMerriweatherNPC: A traveling technician who moves in after the Wall of Flesh falls. Sells wrenches, wire and just enough pressure plates to ruin someone's day.
 		}
 
 		Items: {
