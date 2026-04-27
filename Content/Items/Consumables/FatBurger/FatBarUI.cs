@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -51,8 +52,11 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 			Vector2 iconPos = new Vector2(screenX - 25f, screenY - 2f);
 			Utils.DrawBorderString(spriteBatch, icon, iconPos, Color.White, 1f);
 
-			// Текст: "Fat: 45/100"
-			string text = $"Fat: {(int)fp.FatLevel}/{(int)FatPlayer.MaxFat}";
+			// Текст: "Fat: 45/100" / "Жир: 45/100"
+			string text = Language.GetTextValue(
+				"Mods.LK_Ugrumiy_WP.UI.FatBar.Label",
+				(int)fp.FatLevel,
+				(int)FatPlayer.MaxFat);
 			Vector2 textPos = new Vector2(screenX + barWidth / 2f, screenY + barHeight + 4f);
 			Vector2 textSize = FontAssets.MouseText.Value.MeasureString(text);
 			Utils.DrawBorderString(spriteBatch, text, textPos - new Vector2(textSize.X / 2f, 0f),
@@ -93,14 +97,15 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 
 		private string GetStageName(int stage)
 		{
-			return stage switch
+			string key = stage switch
 			{
-				0 => "Normal",
-				1 => "Chubby",
-				2 => "Fat",
-				3 => "Obese",
-				_ => "Extremely Obese",
+				0 => "Stage0",
+				1 => "Stage1",
+				2 => "Stage2",
+				3 => "Stage3",
+				_ => "Stage4",
 			};
+			return Language.GetTextValue("Mods.LK_Ugrumiy_WP.UI.FatBar." + key);
 		}
 
 		private void DrawBorder(SpriteBatch sb, Rectangle rect, Color color)

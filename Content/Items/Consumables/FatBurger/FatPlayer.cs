@@ -1,6 +1,7 @@
 ﻿using System;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -50,7 +51,8 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 			if (FatLevel > 0)
 			{
 				FatLevel = Math.Max(0f, FatLevel - DeathFatLoss);
-				Main.NewText($"You lost some fat! (-{(int)DeathFatLoss})", 200, 200, 100);
+				string msg = Language.GetTextValue("Mods.LK_Ugrumiy_WP.Misc.FatLostOnDeath", (int)DeathFatLoss);
+				Main.NewText(msg, 200, 200, 100);
 			}
 		}
 
@@ -105,7 +107,8 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 				// Уведомление при переходе на стадию ниже
 				if (FatLevel > 0 && (int)(FatLevel + toLose) / 10 != (int)FatLevel / 10)
 				{
-					Main.NewText($"Burning fat! ({(int)FatLevel}/{(int)MaxFat})", 150, 255, 150);
+					string msg = Language.GetTextValue("Mods.LK_Ugrumiy_WP.Misc.BurningFat", (int)FatLevel, (int)MaxFat);
+					Main.NewText(msg, 150, 255, 150);
 				}
 			}
 		}

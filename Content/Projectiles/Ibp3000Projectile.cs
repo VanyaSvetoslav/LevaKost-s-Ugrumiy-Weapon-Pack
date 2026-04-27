@@ -22,14 +22,23 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
             Projectile.timeLeft = 600;
         }
 
+        // Лёгкое самонаведение: каждый тик чуть-чуть подталкиваем снаряд в сторону
+        // ближайшего врага в радиусе HomingRange. Сила нарочно слабая, чтобы это
+        // не превратилось в seeker-snake — просто корректирует траекторию, если
+        // враг рядом, а основной импульс задаётся бросом.
+        private const float HomingRange = 320f;
+        private const float HomingStrength = 0.45f;
+
         public override void AI()
         {
             Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
 
-            // Замедление по горизонтали (сопротивление воздуха)
-            Projectile.velocity.X *= 0.98f;
-            // Гравитация
-            Projectile.velocity.Y += 0.4f;
+            // Слабее сопротивление воздуха и пониженная гравитация — раньше PSU
+            // ощущался слишком кирпичным; теперь летит дальше и ровнее.
+            Projectile.velocity.X *= 0.992f;
+            Projectile.velocity.Y += 0.22f;
+
+            ApplyLightHoming();
 
             // Электрический след: ярко-голубые искры + случайные пыли молний.
             if (Main.rand.NextBool(2))
@@ -66,6 +75,30 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
 
             // Сам PSU слегка светится синим.
             Lighting.AddLight(Projectile.Center, 0.2f, 0.35f, 0.7f);
+        }
+
+        private void ApplyLightHoming()
+        {
+            int targetIdx = -1;
+            float bestDistSq = HomingRange * HomingRange;
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (!npc.CanBeChasedBy(Projectile)) continue;
+                float distSq = Vector2.DistanceSquared(Projectile.Center, npc.Center);
+                if (distSq < bestDistSq)
+                {
+                    bestDistSq = distSq;
+                    targetIdx = i;
+                }
+            }
+            if (targetIdx < 0) return;
+
+            Vector2 toTarget = Main.npc[targetIdx].Center - Projectile.Center;
+            if (toTarget.LengthSquared() < 0.01f) return;
+            toTarget.Normalize();
+            // Nudge velocity toward target without dominating the throw arc.
+            Projectile.velocity += toTarget * HomingStrength;
         }
 
         public override void OnKill(int timeLeft)

@@ -14,10 +14,10 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons
             Item.knockBack = 6f;
             Item.crit = 4;
 
-            // Скорость броска
-            Item.shootSpeed = 12f;
-            Item.useAnimation = 20;
-            Item.useTime = 20;
+            // Скорость броска (раньше 12f — ощущалось слишком тяжёлым)
+            Item.shootSpeed = 19f;
+            Item.useAnimation = 18;
+            Item.useTime = 18;
             Item.useStyle = ItemUseStyleID.Swing;
 
             // Снаряд
