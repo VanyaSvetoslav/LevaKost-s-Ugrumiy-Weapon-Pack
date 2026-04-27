@@ -6,6 +6,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace LK_Ugrumiy_WP.Content.Projectiles
@@ -210,8 +211,9 @@ namespace LK_Ugrumiy_WP.Content.Projectiles
             if (Projectile.owner == Main.myPlayer)
             {
                 ConsumeOneFromInventory(Main.player[Projectile.owner]);
+                string shatteredText = Language.GetTextValue("Mods.LK_Ugrumiy_WP.Misc.VxeShattered");
                 CombatText.NewText(Main.player[Projectile.owner].getRect(),
-                    new Color(0, 220, 255), "VXE shattered!");
+                    new Color(0, 220, 255), shatteredText);
             }
 
             Projectile.Kill();
