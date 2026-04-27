@@ -27,7 +27,10 @@ namespace LK_Ugrumiy_WP.Content.NPCs
 
 		public override void SetStaticDefaults()
 		{
-			Main.npcFrameCount[Type] = 25;
+			// Matches the Guide's frame layout (same sheet dimensions as CowNPC),
+			// otherwise the sprite drifts vertically while walking because the
+			// game divides texture height by the wrong frame count.
+			Main.npcFrameCount[Type] = Main.npcFrameCount[NPCID.Guide];
 
 			NPCID.Sets.ExtraFramesCount[Type] = 9;
 			NPCID.Sets.AttackFrameCount[Type] = 4;
