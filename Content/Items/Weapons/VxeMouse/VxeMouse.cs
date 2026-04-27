@@ -67,15 +67,9 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons.VxeMouse
 
         private static bool PlayerHasActiveMouse(Player player, int projType)
         {
-            for (int i = 0; i < Main.maxProjectiles; i++)
-            {
-                Projectile other = Main.projectile[i];
-                if (other.active && other.owner == player.whoAmI && other.type == projType)
-                {
-                    return true;
-                }
-            }
-            return false;
+            // ExampleLastPrism-style check: vanilla maintains a per-player projectile
+            // counter, so we don't have to scan the whole projectile array every cast.
+            return player.ownedProjectileCounts[projType] > 0;
         }
 
         public override void AddRecipes()

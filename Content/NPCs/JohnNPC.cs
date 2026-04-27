@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.Bestiary;
@@ -25,12 +26,14 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             "Mods.LK_Ugrumiy_WP.NPCs.JohnNPC.DisplayName",
             () => "John");
 
-        // localAI[0] is reused as a "transformed" flag so the boss morph happens once.
-        private bool Transformed
-        {
-            get => NPC.localAI[0] != 0f;
-            set => NPC.localAI[0] = value ? 1f : 0f;
-        }
+        // Stored as a regular instance field rather than NPC.localAI[]: after the
+        // mini-boss morph switches AIType to Zombie, vanilla Fighter AI overwrites
+        // localAI[0] (door-open timer) every tick — using it for our own flag would
+        // re-trigger BecomeMiniBoss every frame (unkillable John, infinite chat
+        // spam, AI array reset). ModNPC instances persist for the lifetime of the
+        // NPC, so a private field is safe single-player; for MP we sync it via
+        // SendExtraAI/ReceiveExtraAI below.
+        private bool _transformed;
 
         public override void SetStaticDefaults()
         {
@@ -78,7 +81,7 @@ namespace LK_Ugrumiy_WP.Content.NPCs
 
         public override void PostAI()
         {
-            if (Transformed)
+            if (_transformed)
             {
                 // Once angered we keep his fighter behavior locked in and re-target periodically
                 // so he keeps chasing even after the player runs out of his initial vision.
@@ -124,7 +127,7 @@ namespace LK_Ugrumiy_WP.Content.NPCs
 
         private void BecomeMiniBoss(int targetPlayer)
         {
-            Transformed = true;
+            _transformed = true;
 
             NPC.friendly = false;
             NPC.damage = 40;
@@ -157,6 +160,17 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             Main.NewText(transformMsg, 255, 60, 60);
 
             NPC.netUpdate = true;
+        }
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            // Sync the mini-boss flag so joining clients see the morph.
+            writer.Write(_transformed);
+        }
+
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            _transformed = reader.ReadBoolean();
         }
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
