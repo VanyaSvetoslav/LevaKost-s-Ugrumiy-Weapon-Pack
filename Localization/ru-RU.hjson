@@ -171,6 +171,15 @@
 
 		UI: {
 			GrabMilk: Взять молоко
+
+			FatBar: {
+				Label: "Жир: {0}/{1}"
+				Stage0: Норма
+				Stage1: Полноват
+				Stage2: Толстый
+				Stage3: Ожирение
+				Stage4: Морбидное ожирение
+			}
 		}
 
 		Buffs: {
@@ -193,6 +202,13 @@
 			CowBellSpawn: Появилась корова!
 			CowBellCooldownMsg: Корова ещё не отошла. Хватит звонить!
 			JohnTransform: С Джона ХВАТИТ!
+			BurgerEat0: Восхитительный бургер!
+			BurgerEat30: Ты начинаешь полнеть.
+			BurgerEat60: Ты чувствуешь себя очень тяжёлым.
+			BurgerEat90: Ты еле двигаешься...
+			DietPillUse: Стало легче!
+			FatLostOnDeath: "Ты немного похудел! (-{0})"
+			BurningFat: "Сжигаем жир! ({0}/{1})"
 		}
 
 		CandyJokes: {

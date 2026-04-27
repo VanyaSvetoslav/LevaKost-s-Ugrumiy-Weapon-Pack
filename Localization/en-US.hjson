@@ -189,6 +189,13 @@
 			CowBellSpawn: A cow appeared!
 			CowBellCooldownMsg: The cow is still recovering. Stop ringing!
 			JohnTransform: John has had ENOUGH of this!
+			BurgerEat0: Delicious burger!
+			BurgerEat30: You're getting chubby.
+			BurgerEat60: You feel very heavy.
+			BurgerEat90: You can barely move...
+			DietPillUse: You feel lighter!
+			FatLostOnDeath: "You lost some fat! (-{0})"
+			BurningFat: "Burning fat! ({0}/{1})"
 		}
 
 		CandyJokes: {
@@ -216,6 +223,15 @@
 
 		UI: {
 			GrabMilk: Grab Milk
+
+			FatBar: {
+				Label: "Fat: {0}/{1}"
+				Stage0: Normal
+				Stage1: Chubby
+				Stage2: Fat
+				Stage3: Obese
+				Stage4: Extremely Obese
+			}
 		}
 
 		Projectiles: {

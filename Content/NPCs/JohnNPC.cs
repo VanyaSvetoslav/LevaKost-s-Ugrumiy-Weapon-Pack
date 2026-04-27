@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -12,13 +13,31 @@ using LK_Ugrumiy_WP.Content.Items.Accessories;
 namespace LK_Ugrumiy_WP.Content.NPCs
 {
     /// <summary>
-    /// Джон - редкий NPC, спавнящийся в пещерах. Если игрок носит его шляпу при встрече,
-    /// Джон превращается в мини-босса: HP взлетает до 500, он становится враждебным,
-    /// преследует игрока в стиле зомби-Fighter AI и появляется отдельный босс-бар.
+    /// Джон - редкий NPC, спавнящийся в пещерах. Спокойно стоит и комментирует.
+    /// Если игрок носит его шляпу, превращается в мини-босса с собственной логикой
+    /// преследования (без переключения AIType — раньше это ломалось из-за того,
+    /// что ванильный Zombie/Fighter AI пишет в наши NPC.localAI[]/NPC.ai[]).
     /// </summary>
     public class JohnNPC : ModNPC
     {
+        // ---- Mini-boss tuning ----
         private const int MiniBossLifeMax = 500;
+        private const int MiniBossDamage = 55;
+        private const int MiniBossDefense = 18;
+        private const float MiniBossKnockBackResist = 0.35f;
+        private const float MiniBossScale = 1.15f;
+        private const float HatDetectionRange = 400f;
+
+        // ---- Custom AI tuning ----
+        // Manoeuvring numbers higher than vanilla Fighter (~3.5 max speed,
+        // ~0.07 accel) so Джон-mini-boss ощущается резвее и страшнее.
+        private const float Gravity = 0.42f;
+        private const float MaxFallSpeed = 12f;
+        private const float ChaseMaxSpeed = 6.0f;
+        private const float ChaseAccel = 0.22f;
+        private const float ChaseDeccel = 0.32f;
+        private const float JumpStrength = -9.5f;
+        private const float HighJumpStrength = -12.5f;
 
         public override string Texture => "LK_Ugrumiy_WP/Content/NPCs/JohnNPC";
 
@@ -26,14 +45,15 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             "Mods.LK_Ugrumiy_WP.NPCs.JohnNPC.DisplayName",
             () => "John");
 
-        // Stored as a regular instance field rather than NPC.localAI[]: after the
-        // mini-boss morph switches AIType to Zombie, vanilla Fighter AI overwrites
-        // localAI[0] (door-open timer) every tick — using it for our own flag would
-        // re-trigger BecomeMiniBoss every frame (unkillable John, infinite chat
-        // spam, AI array reset). ModNPC instances persist for the lifetime of the
-        // NPC, so a private field is safe single-player; for MP we sync it via
+        // We drive everything off custom AI (aiStyle = -1) to avoid the vanilla
+        // AI dispatch from clobbering our state. Stored in a private field
+        // so vanilla code physically can't touch it. Synced for MP via
         // SendExtraAI/ReceiveExtraAI below.
         private bool _transformed;
+
+        // Frame animation state (we control it ourselves because aiStyle = -1
+        // means tModLoader doesn't auto-cycle frames anymore).
+        private int _frameTimer;
 
         public override void SetStaticDefaults()
         {
@@ -51,11 +71,16 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.value = Item.buyPrice(gold: 1);
             NPC.knockBackResist = 0.5f;
+            // Stays peaceful in calm phase. Flipped to false in BecomeMiniBoss
+            // so contact damage starts dealing once transformed.
             NPC.friendly = true;
             NPC.townNPC = false;
+            NPC.npcSlots = 1f;
+            NPC.aiStyle = -1; // Fully custom AI.
 
-            AIType = NPCID.Guide;
-            AnimationType = NPCID.Guide;
+            // No AIType / AnimationType anymore — we run our own logic and our
+            // own FindFrame, so vanilla NPC.ai[]/localAI[] arrays stay free for
+            // our use without collision with vanilla door/jump timers.
         }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -79,42 +104,134 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<JohnsHat>(), 7));
         }
 
-        public override void PostAI()
+        public override void AI()
         {
+            ApplyGravity();
+
             if (_transformed)
             {
-                // Once angered we keep his fighter behavior locked in and re-target periodically
-                // so he keeps chasing even after the player runs out of his initial vision.
-                if (NPC.target < 0 || NPC.target == 255 || !Main.player[NPC.target].active || Main.player[NPC.target].dead)
-                {
-                    NPC.TargetClosest(true);
-                }
-                return;
+                CombatAI();
             }
-
-            int targetIdx = FindHatWearerInRange(400f);
-            if (targetIdx >= 0)
+            else
             {
-                BecomeMiniBoss(targetIdx);
+                CalmAI();
             }
         }
 
-        private int FindHatWearerInRange(float range)
+        private void ApplyGravity()
         {
-            JohnHatSystem johnSystem = ModContent.GetInstance<JohnHatSystem>();
+            // Standard Terraria-ish gravity. tModLoader does NOT apply gravity
+            // for us when aiStyle = -1, so we have to do it ourselves.
+            NPC.velocity.Y += Gravity;
+            if (NPC.velocity.Y > MaxFallSpeed)
+            {
+                NPC.velocity.Y = MaxFallSpeed;
+            }
+        }
+
+        // ---- Calm phase ---------------------------------------------------
+
+        private void CalmAI()
+        {
+            // Idle: damp horizontal velocity, look at the nearest player.
+            NPC.velocity.X *= 0.85f;
+
+            int gazeIdx = FindNearestActivePlayer(800f);
+            if (gazeIdx >= 0)
+            {
+                NPC.direction = NPC.Center.X < Main.player[gazeIdx].Center.X ? 1 : -1;
+                NPC.spriteDirection = NPC.direction;
+            }
+
+            int hatIdx = FindHatWearerInRange(HatDetectionRange);
+            if (hatIdx >= 0)
+            {
+                BecomeMiniBoss(hatIdx);
+            }
+        }
+
+        // ---- Combat phase -------------------------------------------------
+
+        private void CombatAI()
+        {
+            // Re-target if our current target died/disconnected.
+            if (NPC.target < 0 || NPC.target >= Main.maxPlayers
+                || !Main.player[NPC.target].active
+                || Main.player[NPC.target].dead)
+            {
+                NPC.TargetClosest(true);
+                if (NPC.target < 0 || NPC.target >= Main.maxPlayers)
+                {
+                    return; // No one to chase, just sit still and gravity us down.
+                }
+            }
+
+            Player target = Main.player[NPC.target];
+            float dx = target.Center.X - NPC.Center.X;
+            float dy = target.Center.Y - NPC.Center.Y;
+
+            // Face the target.
+            NPC.direction = dx >= 0f ? 1 : -1;
+            NPC.spriteDirection = NPC.direction;
+
+            // Horizontal pursuit: accelerate toward target, with snappy reversal.
+            float wanted = NPC.direction * ChaseMaxSpeed;
+            if (Math.Sign(NPC.velocity.X) != Math.Sign(wanted) && NPC.velocity.X != 0f)
+            {
+                // Quickly cancel opposite velocity for sharp turns.
+                if (NPC.velocity.X > 0f) NPC.velocity.X = Math.Max(0f, NPC.velocity.X - ChaseDeccel);
+                else NPC.velocity.X = Math.Min(0f, NPC.velocity.X + ChaseDeccel);
+            }
+            else
+            {
+                if (NPC.velocity.X < wanted) NPC.velocity.X = Math.Min(wanted, NPC.velocity.X + ChaseAccel);
+                else if (NPC.velocity.X > wanted) NPC.velocity.X = Math.Max(wanted, NPC.velocity.X - ChaseAccel);
+            }
+
+            bool onGround = NPC.velocity.Y == 0f;
+            bool blockedAhead = Collision.SolidCollision(
+                NPC.position + new Vector2(NPC.direction * 6f, 0f),
+                NPC.width, NPC.height);
+
+            // Jump over walls / up to elevated targets.
+            if (onGround)
+            {
+                if (blockedAhead)
+                {
+                    // Standard hop.
+                    NPC.velocity.Y = JumpStrength;
+                    NPC.netUpdate = true;
+                }
+                else if (dy < -NPC.height * 1.5f && Math.Abs(dx) < 200f)
+                {
+                    // Target is significantly above us and roughly nearby — high jump.
+                    NPC.velocity.Y = HighJumpStrength;
+                    NPC.netUpdate = true;
+                }
+            }
+        }
+
+        // Allow falling through platforms when the player is below us (so John
+        // doesn't get stuck on rope ledges chasing a player downward).
+        public override bool? CanFallThroughPlatforms()
+        {
+            if (!_transformed) return false;
+            if (NPC.target < 0 || NPC.target >= Main.maxPlayers) return false;
+            Player target = Main.player[NPC.target];
+            if (!target.active || target.dead) return false;
+            return target.Top.Y > NPC.Bottom.Y;
+        }
+
+        // ---- Targeting helpers --------------------------------------------
+
+        private int FindNearestActivePlayer(float range)
+        {
             int best = -1;
             float bestDistSq = range * range;
             for (int i = 0; i < Main.maxPlayers; i++)
             {
                 Player p = Main.player[i];
-                if (!p.active || p.dead)
-                {
-                    continue;
-                }
-                if (!johnSystem.playerWearingHat[i])
-                {
-                    continue;
-                }
+                if (!p.active || p.dead) continue;
                 float distSq = Vector2.DistanceSquared(NPC.Center, p.Center);
                 if (distSq < bestDistSq)
                 {
@@ -125,31 +242,44 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             return best;
         }
 
+        private int FindHatWearerInRange(float range)
+        {
+            JohnHatSystem johnSystem = ModContent.GetInstance<JohnHatSystem>();
+            int best = -1;
+            float bestDistSq = range * range;
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player p = Main.player[i];
+                if (!p.active || p.dead) continue;
+                if (!johnSystem.playerWearingHat[i]) continue;
+                float distSq = Vector2.DistanceSquared(NPC.Center, p.Center);
+                if (distSq < bestDistSq)
+                {
+                    bestDistSq = distSq;
+                    best = i;
+                }
+            }
+            return best;
+        }
+
+        // ---- Transformation -----------------------------------------------
+
         private void BecomeMiniBoss(int targetPlayer)
         {
             _transformed = true;
 
             NPC.friendly = false;
-            NPC.damage = 40;
-            NPC.defense = 25;
-            NPC.knockBackResist = 0.2f;
+            NPC.damage = MiniBossDamage;
+            NPC.defense = MiniBossDefense;
+            NPC.knockBackResist = MiniBossKnockBackResist;
             NPC.lifeMax = MiniBossLifeMax;
             NPC.life = MiniBossLifeMax;
 
-            // Switch to a vanilla zombie-style fighter AI so John actually chases the
-            // player. AIType is what tModLoader uses to dispatch vanilla AI for our NPC,
-            // so changing it here (along with NPC.aiStyle and resetting NPC.ai) is what
-            // actually enables the chase behavior — flipping aiStyle alone wasn't enough.
-            AIType = NPCID.Zombie;
-            NPC.aiStyle = NPCAIStyleID.Fighter;
-            for (int k = 0; k < NPC.ai.Length; k++)
-            {
-                NPC.ai[k] = 0f;
-            }
-
-            // Mini-boss flag so the vanilla boss bar appears.
+            // Mini-boss flag so vanilla brings up the boss bar; npcSlots taken
+            // up so we don't get a swarm of zombies muddying the fight.
             NPC.boss = true;
-            NPC.scale = 1.15f;
+            NPC.scale = MiniBossScale;
+            NPC.npcSlots = 5f;
 
             NPC.target = targetPlayer;
             NPC.TargetClosest(true);
@@ -162,9 +292,38 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             NPC.netUpdate = true;
         }
 
+        // ---- Frame animation (custom because aiStyle = -1) ----------------
+
+        public override void FindFrame(int frameHeight)
+        {
+            int frameCount = Main.npcFrameCount[Type];
+
+            // Idle / mid-air pose: use frame 0 (Guide standing pose).
+            bool moving = Math.Abs(NPC.velocity.X) > 0.1f && NPC.velocity.Y == 0f;
+
+            if (!moving)
+            {
+                NPC.frame.Y = 0;
+                _frameTimer = 0;
+                return;
+            }
+
+            // Walking cycle through frames 1..frameCount-1.
+            _frameTimer++;
+            int ticksPerFrame = Math.Max(2, 8 - (int)Math.Abs(NPC.velocity.X));
+            if (_frameTimer >= ticksPerFrame)
+            {
+                _frameTimer = 0;
+                int nextFrame = NPC.frame.Y / frameHeight + 1;
+                if (nextFrame < 1 || nextFrame >= frameCount) nextFrame = 1;
+                NPC.frame.Y = nextFrame * frameHeight;
+            }
+        }
+
+        // ---- Multiplayer sync ---------------------------------------------
+
         public override void SendExtraAI(BinaryWriter writer)
         {
-            // Sync the mini-boss flag so joining clients see the morph.
             writer.Write(_transformed);
         }
 
@@ -173,14 +332,15 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             _transformed = reader.ReadBoolean();
             if (_transformed)
             {
-                // The mini-boss morph in BecomeMiniBoss only runs server-side, but
-                // tModLoader dispatches per-NPC AI based on AIType (not aiStyle).
-                // NPC.aiStyle is auto-synced via the vanilla NPC packet, AIType is
-                // not — without this, joining clients would keep AIType=Guide and
-                // the Fighter chase AI would resolve against the wrong type.
-                AIType = NPCID.Zombie;
+                // Mirror BecomeMiniBoss server-side stat changes that aren't
+                // covered by the vanilla NPC packet (friendly/boss/scale).
+                NPC.friendly = false;
+                NPC.boss = true;
+                NPC.scale = MiniBossScale;
             }
         }
+
+        // ---- Spawn rules --------------------------------------------------
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
