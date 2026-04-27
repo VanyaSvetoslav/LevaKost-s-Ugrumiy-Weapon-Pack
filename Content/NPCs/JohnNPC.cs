@@ -106,11 +106,18 @@ namespace LK_Ugrumiy_WP.Content.NPCs
 
         public override void AI()
         {
+            // Sample ground state BEFORE applying gravity. At the start of AI(),
+            // a grounded NPC has velocity.Y == 0 (set by the previous frame's
+            // tile collision pass); ApplyGravity() then adds Gravity to it,
+            // which would clobber that signal and make every onGround check
+            // below evaluate false (so John could never jump).
+            bool onGround = NPC.velocity.Y == 0f;
+
             ApplyGravity();
 
             if (_transformed)
             {
-                CombatAI();
+                CombatAI(onGround);
             }
             else
             {
@@ -152,7 +159,7 @@ namespace LK_Ugrumiy_WP.Content.NPCs
 
         // ---- Combat phase -------------------------------------------------
 
-        private void CombatAI()
+        private void CombatAI(bool onGround)
         {
             // Re-target if our current target died/disconnected.
             if (NPC.target < 0 || NPC.target >= Main.maxPlayers
@@ -188,7 +195,6 @@ namespace LK_Ugrumiy_WP.Content.NPCs
                 else if (NPC.velocity.X > wanted) NPC.velocity.X = Math.Max(wanted, NPC.velocity.X - ChaseAccel);
             }
 
-            bool onGround = NPC.velocity.Y == 0f;
             bool blockedAhead = Collision.SolidCollision(
                 NPC.position + new Vector2(NPC.direction * 6f, 0f),
                 NPC.width, NPC.height);
