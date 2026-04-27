@@ -171,6 +171,15 @@ namespace LK_Ugrumiy_WP.Content.NPCs
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             _transformed = reader.ReadBoolean();
+            if (_transformed)
+            {
+                // The mini-boss morph in BecomeMiniBoss only runs server-side, but
+                // tModLoader dispatches per-NPC AI based on AIType (not aiStyle).
+                // NPC.aiStyle is auto-synced via the vanilla NPC packet, AIType is
+                // not — without this, joining clients would keep AIType=Guide and
+                // the Fighter chase AI would resolve against the wrong type.
+                AIType = NPCID.Zombie;
+            }
         }
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
