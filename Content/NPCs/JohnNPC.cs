@@ -7,6 +7,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.Utilities;
 using LK_Ugrumiy_WP.Common.Systems;
 using LK_Ugrumiy_WP.Content.Items.Accessories;
 
@@ -57,7 +58,11 @@ namespace LK_Ugrumiy_WP.Content.NPCs
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[Type] = Main.npcFrameCount[NPCID.Guide];
+            // JohnNPC.png is a 40x1400 sheet = 25 frames of 56 px. Using the
+            // Guide's frame count (26) would make the game divide 1400 by 26
+            // and the sprite would drift upward while walking because each
+            // frame is pulled from a non-integer pixel offset.
+            Main.npcFrameCount[Type] = 25;
         }
 
         public override void SetDefaults()
@@ -88,6 +93,28 @@ namespace LK_Ugrumiy_WP.Content.NPCs
             bestiaryEntry.Info.AddRange([
                 new FlavorTextBestiaryInfoElement("Mods.LK_Ugrumiy_WP.Bestiary.JohnNPC")
             ]);
+        }
+
+        // ---- Chat (calm phase only) ---------------------------------------
+
+        // John isn't a town NPC, but we still want the player to be able to
+        // right-click and get a line of dialogue while he's calm. CanChat
+        // defaults to NPC.townNPC; overriding it lets us opt in without
+        // making him try to settle into a house.
+        public override bool CanChat() => !_transformed;
+
+        public override string GetChat()
+        {
+            WeightedRandom<string> chat = new WeightedRandom<string>();
+            chat.Add(Language.GetTextValue("Mods.LK_Ugrumiy_WP.Dialogue.JohnNPC.Standard1"));
+            chat.Add(Language.GetTextValue("Mods.LK_Ugrumiy_WP.Dialogue.JohnNPC.Standard2"));
+            chat.Add(Language.GetTextValue("Mods.LK_Ugrumiy_WP.Dialogue.JohnNPC.Standard3"));
+            return chat;
+        }
+
+        public override void SetChatButtons(ref string button, ref string button2)
+        {
+            // No shop / action button — just a single chat line with vanilla Quit.
         }
 
         public override void HitEffect(NPC.HitInfo hit)
