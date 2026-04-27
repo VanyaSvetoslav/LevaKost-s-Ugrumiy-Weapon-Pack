@@ -16,8 +16,9 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons.VxeMouse
             Item.knockBack = 3f;
             Item.crit = 6;
 
-            // Channeled magic spell: while LMB is held, mana drains and the mouse is alive.
-            Item.mana = 4;
+            // Channeled magic spell: mana is paid once on the initial cast (see
+            // ModifyManaCost below). While the mouse stays alive, no extra mana is spent.
+            Item.mana = 14;
             Item.useAnimation = 18;
             Item.useTime = 18;
             Item.useStyle = ItemUseStyleID.HoldUp;
@@ -38,13 +39,9 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons.VxeMouse
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
             // While channeling, this hook fires repeatedly. Only spawn a mouse if one isn't already in the air.
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            if (PlayerHasActiveMouse(player, type))
             {
-                Projectile other = Main.projectile[i];
-                if (other.active && other.owner == player.whoAmI && other.type == type)
-                {
-                    return false;
-                }
+                return false;
             }
 
             Vector2 spawnPos = player.MountedCenter;
@@ -53,6 +50,31 @@ namespace LK_Ugrumiy_WP.Content.Items.Weapons.VxeMouse
 
             Projectile.NewProjectile(source, spawnPos, startVel, type, damage, knockback, player.whoAmI);
             SoundEngine.PlaySound(SoundID.Item8, spawnPos);
+            return false;
+        }
+
+        public override void ModifyManaCost(Player player, ref float reduce, ref float mult)
+        {
+            // Mana is paid once when the spell starts. While the mouse is already
+            // alive (channeling continues), subsequent re-fires cost nothing.
+            int projType = ModContent.ProjectileType<Projectiles.VxeMouseProjectile>();
+            if (PlayerHasActiveMouse(player, projType))
+            {
+                mult = 0f;
+                reduce = 0f;
+            }
+        }
+
+        private static bool PlayerHasActiveMouse(Player player, int projType)
+        {
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                Projectile other = Main.projectile[i];
+                if (other.active && other.owner == player.whoAmI && other.type == projType)
+                {
+                    return true;
+                }
+            }
             return false;
         }
 

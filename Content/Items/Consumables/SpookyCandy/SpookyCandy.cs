@@ -63,7 +63,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 			player.statLife = Math.Min(player.statLife + healAmount, player.statLifeMax2);
 			player.HealEffect(healAmount);
 
-			Main.NewText("The candy fills you with overwhelming energy!", 50, 255, 100);
+			Main.NewText(Language.GetTextValue("Mods.LK_Ugrumiy_WP.Misc.MegaHeal"), 50, 255, 100);
 
 			// Зелёные искры
 			for (int i = 0; i < 30; i++)
@@ -76,7 +76,7 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 
 		private void DoExplosion(Player player)
 		{
-			Main.NewText("The candy... was a firecracker?!", 255, 150, 50);
+			Main.NewText(Language.GetTextValue("Mods.LK_Ugrumiy_WP.Misc.CandyExplosion"), 255, 150, 50);
 
 			// Визуальный взрыв
 			for (int i = 0; i < 50; i++)
@@ -111,8 +111,9 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 			Main.NewText(joke, 255, 80, 200);
 
 			// Убиваем игрока
+			string deathReason = Language.GetTextValue("Mods.LK_Ugrumiy_WP.Misc.CandyDeathReason", player.name);
 			player.KillMe(
-				PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral($"{player.name} shouldn't have eaten that candy...")),
+				PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral(deathReason)),
 				999999,
 				0
 			);
@@ -123,31 +124,24 @@ namespace LK_Ugrumiy_WP.Content.Items.Consumables
 		/// </summary>
 		private static string GetRandomCandyJoke()
 		{
-			string[] jokes = new string[]
+			// Read jokes from localization (Mods.LK_Ugrumiy_WP.CandyJokes.Joke{N}).
+			// Ranges automatically — adding more Joke{N} keys to the .hjson is enough.
+			var keys = new System.Collections.Generic.List<string>();
+			for (int i = 1; i <= 100; i++)
 			{
-				"Why did the candy go to school? Because it wanted to be a Smartie!",
-				"What do you call a candy that sings? A wrapper!",
-				"Why don't candies ever win arguments? They always get licked!",
-				"What's a candy's favorite dance? The Tootsie Roll!",
-				"Why was the candy so good at baseball? It was a real sucker for the game!",
-				"What did one candy say to the other? 'We're in a sticky situation!'",
-				"Why did the gummy bear go to the dentist? He lost his filling!",
-				"How does candy greet each other? 'Hey there, sweet thing!'",
-				"What's a ghost's favorite candy? Boo-ble gum!",
-				"Why did the lollipop cross the road? Because it was stuck to the chicken!",
-				"What candy is always late? Choco-LATE!",
-				"What do you call a bear with no teeth? A gummy bear!",
-				"Why did the M&M go to school? It wanted to be a Smartie!",
-				"What's a candy's favorite type of music? Wrap music!",
-				"Knock knock. Who's there? Candy. Candy who? Candy door open any slower?!",
-				"My doctor told me to stop eating candy... that was the sweetest advice I never took.",
-				"I told a candy joke once. It was pretty sweet, but the delivery was a bit hard to swallow.",
-				"What did the candy say before it died? 'Life is sweet... too sweet...'",
-				"Why did the jawbreaker file a police report? It got mugged by a mouth!",
-				"I ate a candy and it killed me. At least I died doing what I loved.",
-			};
+				string key = $"Mods.LK_Ugrumiy_WP.CandyJokes.Joke{i}";
+				if (!Language.Exists(key))
+				{
+					break;
+				}
+				keys.Add(key);
+			}
 
-			return jokes[Main.rand.Next(jokes.Length)];
+			if (keys.Count == 0)
+			{
+				return string.Empty;
+			}
+			return Language.GetTextValue(keys[Main.rand.Next(keys.Count)]);
 		}
 
 		public override void AddRecipes()

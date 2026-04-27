@@ -55,9 +55,9 @@
 				DisplayName: IBP-3000
 				Tooltip:
 					'''
-					A throwable iron star infused with fallen star energy
-					Deals 69 damage per hit
-					'Shine bright like a deadly star'
+					A throwable PSU brick crackling with raw electricity
+					Deals 69 damage and zaps on hit
+					'Surge protection? Never heard of it.'
 					'''
 			}
 
@@ -174,6 +174,44 @@
 				DisplayName: Cherry Cooldown
 				Description: You can't eat another cherry yet...
 			}
+
+			CowBellCooldown: {
+				DisplayName: Cow Cooldown
+				Description: The cow needs a moment before another summon...
+			}
+		}
+
+		Misc: {
+			VxeShattered: VXE shattered!
+			MegaHeal: The candy fills you with overwhelming energy!
+			CandyExplosion: The candy... was a firecracker?!
+			CandyDeathReason: "{0} shouldn't have eaten that candy..."
+			CowBellSpawn: A cow appeared!
+			CowBellCooldownMsg: The cow is still recovering. Stop ringing!
+			JohnTransform: John has had ENOUGH of this!
+		}
+
+		CandyJokes: {
+			Joke1: Why did the candy go to school? Because it wanted to be a Smartie!
+			Joke2: What do you call a candy that sings? A wrapper!
+			Joke3: Why don't candies ever win arguments? They always get licked!
+			Joke4: What's a candy's favorite dance? The Tootsie Roll!
+			Joke5: Why was the candy so good at baseball? It was a real sucker for the game!
+			Joke6: What did one candy say to the other? 'We're in a sticky situation!'
+			Joke7: Why did the gummy bear go to the dentist? He lost his filling!
+			Joke8: How does candy greet each other? 'Hey there, sweet thing!'
+			Joke9: What's a ghost's favorite candy? Boo-ble gum!
+			Joke10: Why did the lollipop cross the road? Because it was stuck to the chicken!
+			Joke11: What candy is always late? Choco-LATE!
+			Joke12: What do you call a bear with no teeth? A gummy bear!
+			Joke13: What's a candy's favorite type of music? Wrap music!
+			Joke14: Knock knock. Who's there? Candy. Candy who? Candy door open any slower?!
+			Joke15: My doctor told me to stop eating candy... that was the sweetest advice I never took.
+			Joke16: I told a candy joke once. It was pretty sweet, but the delivery was a bit hard to swallow.
+			Joke17: What did the candy say before it died? 'Life is sweet... too sweet...'
+			Joke18: Why did the jawbreaker file a police report? It got mugged by a mouth!
+			Joke19: I ate a candy and it killed me. At least I died doing what I loved.
+			Joke20: They told me candy wouldn't kill me. They lied.
 		}
 
 		UI: {
